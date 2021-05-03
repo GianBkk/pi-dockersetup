@@ -1,0 +1,42 @@
+version: "3.1"
+
+services:
+  mqtt:
+    container_name: mqtt
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - /home/pi/mosquitto/config:/mosquitto/config
+      - /home/pi/mosquitto/dat:/mosquitto/data
+      - /home/pi/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - 9000:9000
