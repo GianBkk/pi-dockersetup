@@ -7,17 +7,20 @@ services:
     restart: always
     volumes:
       - /home/pi/mosquitto/config:/mosquitto/config
-      - /home/pi/mosquitto/dat:/mosquitto/data
+      - /home/pi/mosquitto/data:/mosquitto/data
       - /home/pi/mosquitto/log:/mosquitto/log
     ports:
       - 1883:1883
       - 9001:9001
   mongodb:
-    image: mongo
+    image: mongo:latest
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 1234
+    ports: 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
 
   mongo-express:
     image: mongo-express
@@ -40,3 +43,20 @@ services:
       - ./portainer-data:/data
     ports:
       - 9000:9000
+
+  postgres:
+    image: postges:13.5
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=1234
+      - APP_DB_USER=postgres
+      - APP_DB_PASS=1234
+      - APP_DB_NAME=statedb
+    volumes:
+      - ./db:/docker-entypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+  volumes:
+    mongo_data_container:
